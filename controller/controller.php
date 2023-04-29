@@ -92,35 +92,112 @@ class Query
         return $message;
     }
 
-    public function updateProfile($user_id)
+}
+class DB
+{
+    private $host = "localhost";
+    private $user = "root";
+    private $password = "";
+    private $database = "ppl";
+    private $conn;
+
+    public function __construct()
     {
-        $update_name =  $_POST['update_name'];
-        $update_email = $_POST['update_email'];
-        $update_namausaha =$_POST['update_namausaha'];
-        $update_deskripsi =$_POST['update_deskripsi'];
-        echo "<script></script>";
-        mysqli_query($this->conn, "UPDATE `pelakuagro` SET name = '$update_name', email = '$update_email', namausaha = '$update_namausaha', deskripsi = '$update_deskripsi' WHERE id_agro = '$user_id'") or die('query failed');
-
-        $update_image = $_FILES['update_image']['name'];
-        $update_image_size = $_FILES['update_image']['size'];
-        $update_image_tmp_name = $_FILES['update_image']['tmp_name'];
-        $update_image_folder = $update_image;
-
-        if (!empty($update_image)) {
-            if ($update_image_size > 2000000) {
-                echo "image is too large";
-            //  $this->message[] = 'image is too large';
-            } else {
-                $image_update_query = mysqli_query($this->conn, "UPDATE `pelakuagro` SET image = '$update_image' WHERE id_agro = '$user_id'") or die('query failed');
-                if ($image_update_query) {
-                    move_uploaded_file($update_image_tmp_name, "../../upimage/". $update_image_folder);
-                }
-                header("Location: homeAgro.php");
-                //  $this->message[] = 'image updated succssfully!';
-            }
+        $this->conn = mysqli_connect($this->host, $this->user, $this->password, $this->database);
+        if (!$this->conn) {
+            die("Connection failed: " . mysqli_connect_error());
         }
     }
 
+    public function getConnection()
+    {
+        return $this->conn;
+    }
+
+    public function __destruct()
+    {
+        mysqli_close($this->conn);
+    }
+}
+
+$db = new DB();
+$conn = $db->getConnection();
+class UserUpdater {
+        private $conn;
+        private $user_id;
+        private $message;
+     
+        public function __construct($conn, $userId) {
+           $this->conn = $conn;
+           $this->user_id = $userId;
+           $this->message = array();
+        }
+        public function updateProfile() {
+            if(isset($_POST['update_profile'])){
+            $update_name = mysqli_real_escape_string($this->conn, $_POST['update_name']);
+            $update_email = mysqli_real_escape_string($this->conn, $_POST['update_email']);
+            $update_nomortelepon = mysqli_real_escape_string($this->conn, $_POST['update_nomortelepon']);
+            $update_alamatProfil =  mysqli_real_escape_string($this->conn, $_POST['update_alamatProfil']);
+            $update_namausaha = mysqli_real_escape_string($this->conn, $_POST['update_namausaha']);
+            $update_deskripsi = mysqli_real_escape_string($this->conn, $_POST['update_deskripsi']);
+            $update_harga = mysqli_real_escape_string($this->conn, $_POST['update_harga']);
+            mysqli_query($this->conn, "UPDATE `pelakuagro` SET name = '$update_name', email = '$update_email', nomortelepon = '$update_nomortelepon', alamatProfil = '$update_alamatProfil', namausaha = '$update_namausaha', deskripsi = '$update_deskripsi', harga = '$update_harga' WHERE id_agro = '$this->user_id'") or die('query failed');
+            
+            $update_image = $_FILES['update_image']['name'];
+            $update_image_size = $_FILES['update_image']['size'];
+            $update_image_tmp_name = $_FILES['update_image']['tmp_name'];
+            $update_image_folder = 'uploaded_img/'.$update_image;
+    
+            if(!empty($update_image)){
+                if($update_image_size > 2000000){
+                    $this->message[] = 'image is too large';
+                }else{
+                    $image_update_query = mysqli_query($this->conn, "UPDATE `pelakuagro` SET image = '$update_image' WHERE id_agro = '$this->user_id'") or die('query failed');
+                    if($image_update_query){
+                    move_uploaded_file($update_image_tmp_name, $update_image_folder);
+                    }
+                    $this->message[] = 'image updated succssfully!';
+                }
+            }
+        }
+        }
+    
+    // public function updateProfile($user_id)
+    // {
+    //     $update_name =  $_POST['update_name'];
+    //     $update_email = $_POST['update_email'];
+    //     $update_nomortelepon = $_POST['update_nomortelepon'];
+    //     $update_alamatProfil = $_POST['update_alamatProfil'];
+    //     $update_namausaha =$_POST['update_namausaha'];
+    //     $update_deskripsi =$_POST['update_deskripsi'];
+    //     $update_harga = $_POST['update_harga'];
+    //     echo "<script></script>";
+    //     mysqli_query($this->conn, "UPDATE `pelakuagro` SET name = '$update_name', email = '$update_email', nomortelepon = '$update_nomortelepon', alamatProfil = '$update_alamatProfil', namausaha = '$update_namausaha', deskripsi = '$update_deskripsi', harga = '$update_harga' WHERE id_agro = '$user_id'") or die('query failed');
+
+    //     $update_image = $_FILES['update_image']['name'];
+    //     $update_image_size = $_FILES['update_image']['size'];
+    //     $update_image_tmp_name = $_FILES['update_image']['tmp_name'];
+    //     $update_image_folder = $update_image;
+
+    //     if (!empty($update_image)) {
+    //         if ($update_image_size > 2000000) {
+    //             echo "image is too large";
+    //         //  $this->message[] = 'image is too large';
+    //         } else {
+    //             $image_update_query = mysqli_query($this->conn, "UPDATE `pelakuagro` SET image = '$update_image' WHERE id_agro = '$user_id'") or die('query failed');
+    //             if ($image_update_query) {
+    //                 move_uploaded_file($update_image_tmp_name, "../../upimage/". $update_image_folder);
+    //             }
+    //             header("Location: homeAgro.php");
+    //             //  $this->message[] = 'image updated succssfully!';
+    //         }
+    //     }
+    // }
+
+    
+    public function getMessages() {
+        return $this->message;
+     }
 
     public function checkmitradata()
     {

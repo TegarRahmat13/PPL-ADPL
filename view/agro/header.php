@@ -1,3 +1,16 @@
+<?php 
+session_start();
+include '../../linkconfig.php';
+require PATH_CONTROLLER . "controller.php";
+
+if(isset($_POST['logout'])){
+
+    session_destroy();
+    header('location: loginAgro.php');
+
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,9 +98,13 @@
                                 </a>
                             <hr>
                             <li class="sub__item">
-                                <a href="#">
+                                <a href="loginAgro.php">
                                 <div class="item_logout">
-                                    <i class="ri-login-box-line"></i><p>Logout</p>
+                                <form action="" method="POST"  style="margin: 15px;margin-top:60px;color:white;text-align:left">
+                                    <button style="border:none; background:none; font-family: var(--body-font); font-size: 1.2rem;font-weight: 500;display: flex;align-items: center;gap: 1rem;" class="ri-login-box-line" name="logout" type="submit">Logout</button>
+                                    <!-- <a href="#" class="dashboard-nav-item" ><i class="fas fa-sign-out-alt"></i> Logout </a> -->
+                                </form>
+                                    <!-- <i class="ri-login-box-line" name="logout" type="submit"></i><p>Logout</p> -->
                                 </div>
                                 </a>
                             </li>   
